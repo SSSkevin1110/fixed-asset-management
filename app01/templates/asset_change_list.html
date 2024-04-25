@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <a class="btn btn-success" href="/asset/change/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                新建转让申请
+            </a>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                转让申请列表
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    {% for field in form %}
+                        <th class="text-center">{{ field.label }}</th>
+                    {% endfor %}
+                    <th class="text-center">操作</th>
+                    <th class="text-center">确认</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in queryset %}
+                    <tr>
+                        <th class="text-center">{{ obj.Time|date:"Y-m-d" }}</th>
+                        <td class="text-center">{{ obj.Reg_number }}</td>
+                        <td class="text-center">{{ obj.Model }}</td>
+                        <td class="text-center">{{ obj.Name }}</td>
+                        <td class="text-center">{{ obj.OriginalUnit.Name }}</td>
+                        <td class="text-center">{{ obj.NowUnit.Name }}</td>
+                        <td class="text-center">{{ obj.Applicant }}</td>
+                        <td class="text-center">
+                            <a class="btn btn-danger btn-xs" href="/asset/change/{{ obj.id }}/del/">删除</a>
+                        </td>
+                        <td class="text-center">
+                            {% if obj.now_type == 0 and not obj.confirmed %}
+                                <button class="btn btn-primary btn-xs text-center"
+                                        data-registration-number="{{ obj.Reg_number }}"
+                                        onclick="confirmVerification('{{ obj.Reg_number }}')">确认
+                                </button>
+                            {% else %}
+                                <button class="btn btn-success btn-xs text-center" disabled>已确认</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function confirmVerification(Reg_number) {
+            var confirmed = confirm("确认执行操作吗？");
+            if (confirmed) {
+                fetch("/asset/change/info/verify/" + Reg_number + '/', {
+                    method: "POST",
+                    credentials: "same-origin"
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();  // 假设回复为纯文本
+                    })
+                    .then(function (message) {
+                        var button;
+                        message = message.trim();
+                        alert(message);  // 显示服务器消息
+                        if (message === "操作成功") {
+                            button = document.querySelector("button[data-registration-number='" + Reg_number + "']");
+                            if (button) {
+                                button.innerText = "已确认";
+                                button.classList.remove("btn-primary");
+                                button.classList.add("btn-success");
+                                button.disabled = true;  // 禁用按钮
+                            } else {
+                                console.error("Button not found for Registration Number:", Reg_number);
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Fetch error:", error);
+                        alert("操作失败");
+                    });
+            }
+        }
+    </script>
+
+{% endblock %}

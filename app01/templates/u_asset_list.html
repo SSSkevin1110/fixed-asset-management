@@ -1,0 +1,80 @@
+{% extends 'u_layout.html' %}
+{% block content_u %}
+    <div class="container">
+        <div style="margin-bottom: 10px;">
+            <a class="btn btn-success" href="/asset/add/" style="margin-left: -110px;">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                登记资产
+            </a>
+            <div style="float: right; width: 350px;margin-right: -110px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="搜索..." value="{{ search_data }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                        <span class="text-center" style="width: 45px;">
+                                <select name="search_field" class="form-control">
+                                    <option value="name">设备名称</option>
+                                    <option value="model">设备型号</option>
+                                    <option value="reg_num">登记编号</option>
+                                </select>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default" style="margin-right: -130px;margin-left: -140px;">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                资产列表
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th class="text-center">登记编号</th>
+                    <th class="text-center">设备型号</th>
+                    <th class="text-center">设备名称</th>
+                    <th class="text-center">供应商信息</th>
+                    <th class="text-center">单价</th>
+                    <th class="text-center">登记人</th>
+                    <th class="text-center">所属部门</th>
+                    <th class="text-center">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in data_list %}
+                    <tr>
+                        <th class="text-center">{{ obj.Registration_number }}</th>
+                        <td class="text-center">{{ obj.Model }}</td>
+                        <td class="text-center">{{ obj.Name }}</td>
+                        <td class="text-center">{{ obj.Supplier_info }}</td>
+                        <td class="text-center">{{ obj.Unit_price }}</td>
+                        <td class="text-center">{{ obj.Applicant }}</td>
+                        <td class="text-center">{{ obj.BelongTo }}</td>
+                        <td class="text-center">
+                            <a class="btn btn-primary btn-xs" href="/asset/{{ obj.id }}/edit">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/asset/{{ obj.id }}/del/">删除</a>
+                            <a class="btn btn-default btn-xs" style="color: darkseagreen;"
+                               href="/asset/{{ obj.id }}/maintain/add">维修</a>
+                            <a class="btn btn-default btn-xs" style="color:grey;"
+                               href="/asset/{{ obj.id }}/damage/add/">报废</a>
+                            {# ?reg_number={{ obj.Registration_number }}#}
+                            <a class="btn btn-default btn-xs" style="color: hotpink;"
+                               href="/asset/{{ obj.id }}/change/add">转让</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+{% endblock %}
